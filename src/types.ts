@@ -20,3 +20,26 @@ export interface SearchState {
 export interface Preferences {
   token: string
 }
+
+export interface WrikeUser {
+  id: string,
+  firstName: string,
+  lastName:  string,
+  profiles: UserProfile[],
+  me: boolean,
+}
+
+export interface WrikeResponse<T> {
+  kind: string,
+  data: T[]
+}
+
+export interface APIError {
+  error: string,
+  errorDescription: string
+}
+
+interface UserProfile {
+  accountId: string,
+  email: string,
+}
