@@ -1,8 +1,3 @@
-export interface WrikeTaskResponse {
-  kind: string,
-  data: WrikeTask[]
-}
-  
 export interface WrikeTask {
   id: string,
   title: string,
