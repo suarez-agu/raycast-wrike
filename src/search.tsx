@@ -5,13 +5,13 @@ import {
 	showToast,
 	Toast,
 	Detail,
-	getPreferenceValues, LocalStorage,
 } from "@raycast/api";
 import { useState, useEffect, useRef, useCallback } from "react";
-import fetch, { AbortError } from "node-fetch";
-import { WrikeResponse, WrikeTask, WrikeUser, SearchState, Preferences, APIError } from "./types";
+import { WrikeTask, SearchState } from "./types";
 import { NodeHtmlMarkdown } from 'node-html-markdown'
 import { URLSearchParams } from "url";
+import {getCurrentUser, getRequest, statusToColorMap} from "./wrike";
+import { AbortError } from "node-fetch";
 
 
 export default function Command() {
@@ -48,7 +48,7 @@ function TaskDetail({ task }: {task: WrikeTask}) {
       metadata={
         <Detail.Metadata>
           <Detail.Metadata.TagList title="Status">
-            <Detail.Metadata.TagList.Item text={task.status} color={"#3cb043"} />
+            <Detail.Metadata.TagList.Item text={task.status} color={statusToColorMap(task.status)} />
           </Detail.Metadata.TagList>
           <Detail.Metadata.Link
             title="Link"
@@ -160,48 +160,11 @@ async function performSearch(searchText: string, signal: AbortSignal): Promise<W
 		params.append("sortOrder", 'Asc')
 	}
 
-  const response = await wrikeGetRequest<WrikeTask>('tasks', params, signal);
+  const response = await getRequest<WrikeTask>('tasks', params, signal);
 
   return response.data.map((result) => {
     return result;
   });
 }
 
-async function getUsersFromWrike(signal: AbortSignal): Promise<WrikeResponse<WrikeUser>> {
-	const users = await wrikeGetRequest<WrikeUser>('contacts', new URLSearchParams(), signal);
-	return users;
-}
 
-async function getCurrentUser(signal: AbortSignal): Promise<WrikeUser> {
-	const currentUserString = await LocalStorage.getItem<string>("currentUser");
-	if (currentUserString) {
-		return JSON.parse(currentUserString) as WrikeUser
-	} else {
-		const users = await getUsersFromWrike(signal);
-		const currentUser = users.data.find(user => user.me);
-		if(!currentUser){
-			throw new Error("Unable to find current user. Odd...")
-		}
-		LocalStorage.setItem("currentUser", JSON.stringify(currentUser))
-		return currentUser;
-	}
-}
-
-async function wrikeGetRequest<T>(endpoint: string, params: URLSearchParams, signal: AbortSignal): Promise<WrikeResponse<T>> {
-	console.log(`Getting ${endpoint}`)
-	const preferences = getPreferenceValues<Preferences>();
-	const response = await fetch(`https://www.wrike.com/api/v4/${endpoint}?${params.toString()}`, {
-		method: "get",
-		headers: {
-			Authorization: `bearer ${preferences.token}`
-		},
-		signal: signal,
-	});
-
-	const json = (await response.json()) as WrikeResponse<T> | APIError;
-	if (!response.ok || "errorDescription" in json) {
-		throw new Error("errorDescription" in json ? json.errorDescription : response.statusText);
-	}
-
-	return json;
-}
