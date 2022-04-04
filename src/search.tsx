@@ -1,8 +1,9 @@
 import { ActionPanel, Action, List, showToast, Toast, Detail, getPreferenceValues } from "@raycast/api";
 import { useState, useEffect, useRef, useCallback } from "react";
 import fetch, { AbortError } from "node-fetch";
-import { WrikeTask, WrikeTaskResponse, SearchState, Preferences } from "./types";
+import { WrikeResponse, WrikeTask, WrikeUser, SearchState, Preferences, APIError } from "./types";
 import { NodeHtmlMarkdown } from 'node-html-markdown'
+import { URLSearchParams } from "url";
 
 
 export default function Command() {
@@ -134,29 +135,55 @@ function useSearch() {
 }
 
 async function performSearch(searchText: string, signal: AbortSignal): Promise<WrikeTask[]> {
-  const preferences = getPreferenceValues<Preferences>();
   const params = new URLSearchParams();
-  params.append("title", searchText)
+	const currentUser = await getCurrentUser(signal);
+
   params.append("fields", `[description]`)
 
+	if(searchText.length == 0) {
+		params.append("authors", `[${currentUser?.id}]`)
+		params.append("status", "Active")
+		params.append("sortField", 'UpdatedDate')
+		params.append("sortOrder", 'Desc')
+		params.append("limit", '100')
+	} else {
+		params.append("title", searchText)
+		params.append("sortField", 'status')
+		params.append("sortOrder", 'Asc')
+	}
 
-  const response = await fetch("https://www.wrike.com/api/v4/tasks" + "?" + params.toString(), {
-    method: "get",
-    headers: {
-      Authorization: `bearer ${preferences.token}`
-    },
-    signal: signal,
-  });
+  const response = await wrikeGetRequest<WrikeTask>('tasks', params, signal);
 
-  const json = (await response.json()) as WrikeTaskResponse
-    | { code: string; message: string };
-
-  if (!response.ok || "message" in json) {
-    throw new Error("message" in json ? json.message : response.statusText);
-  }
-
-  return json.data.map((result) => {
+  return response.data.map((result) => {
     return result;
   });
 }
 
+async function getUsersFromWrike(signal: AbortSignal): Promise<WrikeResponse<WrikeUser>> {
+	const users = await wrikeGetRequest<WrikeUser>('contacts', new URLSearchParams(), signal);
+	return users;
+}
+
+async function getCurrentUser(signal: AbortSignal) {
+	const users = await getUsersFromWrike(signal);
+	return users.data.find(user => user.me);
+}
+
+async function wrikeGetRequest<T>(endpoint: string, params: URLSearchParams, signal: AbortSignal): Promise<WrikeResponse<T>> {
+	console.log(`Getting ${endpoint}`)
+	const preferences = getPreferenceValues<Preferences>();
+	const response = await fetch(`https://www.wrike.com/api/v4/${endpoint}?${params.toString()}`, {
+		method: "get",
+		headers: {
+			Authorization: `bearer ${preferences.token}`
+		},
+		signal: signal,
+	});
+
+	const json = (await response.json()) as WrikeResponse<T> | APIError;
+	if (!response.ok || "errorDescription" in json) {
+		throw new Error("errorDescription" in json ? json.errorDescription : response.statusText);
+	}
+
+	return json;
+}
