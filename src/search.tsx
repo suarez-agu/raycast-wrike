@@ -44,6 +44,18 @@ function TaskDetail({ task }: {task: WrikeTask}) {
     <Detail
       markdown={detailsMarkdown}
       navigationTitle={task.title}
+			actions={
+				<ActionPanel>
+					<ActionPanel.Section>
+						<Action.OpenInBrowser title="Open in Browser" url={task.permalink} />
+						<Action.CopyToClipboard
+							title="Copy Permalink"
+							content={task.permalink}
+							shortcut={{ modifiers: ["cmd"], key: "." }}
+						/>
+					</ActionPanel.Section>
+				</ActionPanel>
+			}
       metadata={
         <Detail.Metadata>
           <Detail.Metadata.TagList title="Status">
