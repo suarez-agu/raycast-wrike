@@ -2,11 +2,13 @@
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "wrike",
   "title": "Wrike",
-  "description": "Perform different wrike actions",
+  "description": "Interact with Wrike",
   "icon": "command-icon.png",
   "author": "Agustin Suarez",
+	"owner": "Agustin Suarez",
   "license": "MIT",
-  "preferences": [
+	"categories": ["Productivity", "Web"],
+	"preferences": [
     {
       "name": "token",
       "required": true,
@@ -15,13 +17,16 @@
       "description": "Create a permanent token using the following link https://www.wrike.com/frontend/apps/index.html#/api"
     }
   ],
-  "commands": [
+	"access": "public",
+	"keywords": ["Wrike"],
+	"commands": [
     {
       "name": "search",
       "title": "Search Wrike Tasks",
       "description": "Search Wrike tasks by name",
-      "mode": "view"
-    }
+      "mode": "view",
+			"icon": "wrike_logo.png"
+		}
   ],
   "dependencies": {
     "@raycast/api": "^1.31.0",
