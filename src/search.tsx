@@ -1,4 +1,12 @@
-import { ActionPanel, Action, List, showToast, Toast, Detail, getPreferenceValues } from "@raycast/api";
+import {
+	ActionPanel,
+	Action,
+	List,
+	showToast,
+	Toast,
+	Detail,
+	getPreferenceValues,
+} from "@raycast/api";
 import { useState, useEffect, useRef, useCallback } from "react";
 import fetch, { AbortError } from "node-fetch";
 import { WrikeResponse, WrikeTask, WrikeUser, SearchState, Preferences, APIError } from "./types";
