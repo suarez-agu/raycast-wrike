@@ -5,7 +5,7 @@ import {
 	showToast,
 	Toast,
 	Detail,
-	getPreferenceValues,
+	getPreferenceValues, LocalStorage,
 } from "@raycast/api";
 import { useState, useEffect, useRef, useCallback } from "react";
 import fetch, { AbortError } from "node-fetch";
@@ -172,9 +172,19 @@ async function getUsersFromWrike(signal: AbortSignal): Promise<WrikeResponse<Wri
 	return users;
 }
 
-async function getCurrentUser(signal: AbortSignal) {
-	const users = await getUsersFromWrike(signal);
-	return users.data.find(user => user.me);
+async function getCurrentUser(signal: AbortSignal): Promise<WrikeUser> {
+	const currentUserString = await LocalStorage.getItem<string>("currentUser");
+	if (currentUserString) {
+		return JSON.parse(currentUserString) as WrikeUser
+	} else {
+		const users = await getUsersFromWrike(signal);
+		const currentUser = users.data.find(user => user.me);
+		if(!currentUser){
+			throw new Error("Unable to find current user. Odd...")
+		}
+		LocalStorage.setItem("currentUser", JSON.stringify(currentUser))
+		return currentUser;
+	}
 }
 
 async function wrikeGetRequest<T>(endpoint: string, params: URLSearchParams, signal: AbortSignal): Promise<WrikeResponse<T>> {
