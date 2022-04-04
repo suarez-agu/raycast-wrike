@@ -13,7 +13,6 @@ import { URLSearchParams } from "url";
 import {getCurrentUser, getRequest, statusToColorMap} from "./wrike";
 import { AbortError } from "node-fetch";
 
-
 export default function Command() {
   const { state, search } = useSearch();
 
