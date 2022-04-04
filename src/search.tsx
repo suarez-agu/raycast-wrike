@@ -5,12 +5,13 @@ import {
 	showToast,
 	Toast,
 	Detail,
+	LocalStorage,
 } from "@raycast/api";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { WrikeTask, SearchState } from "./types";
 import { NodeHtmlMarkdown } from 'node-html-markdown'
 import { URLSearchParams } from "url";
-import {getCurrentUser, getRequest, statusToColorMap} from "./wrike";
+import { getCurrentUser, getRequest, statusToColorMap } from "./wrike";
 import { AbortError } from "node-fetch";
 
 export default function Command() {
@@ -22,6 +23,11 @@ export default function Command() {
       onSearchTextChange={search}
       searchBarPlaceholder="Search Wrike tasks..."
       throttle
+			actions={
+				<ActionPanel>
+					<	Action key="clearStorage" onAction={() => LocalStorage.clear()} title={"Clear local storage"} />
+				</ActionPanel>
+			}
     >
       <List.Section title="Results" subtitle={state.results.length + ""}>
         {state.results.map((searchResult) => (
