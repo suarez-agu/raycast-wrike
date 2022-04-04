@@ -3,12 +3,12 @@
   "name": "wrike",
   "title": "Wrike",
   "description": "Interact with Wrike",
-  "icon": "command-icon.png",
-  "author": "Agustin Suarez",
-	"owner": "Agustin Suarez",
+  "icon": "wrike_logo.png",
+  "author": "Slus",
+  "owner": "Slus",
   "license": "MIT",
-	"categories": ["Productivity", "Web"],
-	"preferences": [
+  "categories": ["Productivity", "Web"],
+  "preferences": [
     {
       "name": "token",
       "required": true,
@@ -17,16 +17,16 @@
       "description": "Create a permanent token using the following link https://www.wrike.com/frontend/apps/index.html#/api"
     }
   ],
-	"access": "public",
-	"keywords": ["Wrike"],
-	"commands": [
+  "access": "public",
+  "keywords": ["Wrike"],
+  "commands": [
     {
       "name": "search",
       "title": "Search Wrike Tasks",
       "description": "Search Wrike tasks by name",
       "mode": "view",
-			"icon": "wrike_logo.png"
-		}
+      "icon": "wrike_logo.png"
+    }
   ],
   "dependencies": {
     "@raycast/api": "^1.31.0",
