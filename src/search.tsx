@@ -1,15 +1,7 @@
-import {
-	ActionPanel,
-	Action,
-	List,
-	showToast,
-	Toast,
-	Detail,
-	LocalStorage,
-} from "@raycast/api";
+import { ActionPanel, Action, List, showToast, Toast, Detail, LocalStorage } from "@raycast/api";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { WrikeTask, SearchState } from "./types";
-import { NodeHtmlMarkdown } from 'node-html-markdown'
+import { NodeHtmlMarkdown } from "node-html-markdown";
 import { URLSearchParams } from "url";
 import { getCurrentUser, getRequest, statusToColorMap } from "./wrike";
 import { AbortError } from "node-fetch";
@@ -23,11 +15,11 @@ export default function Command() {
       onSearchTextChange={search}
       searchBarPlaceholder="Search Wrike tasks..."
       throttle
-			actions={
-				<ActionPanel>
-					<	Action key="clearStorage" onAction={() => LocalStorage.clear()} title={"Clear local storage"} />
-				</ActionPanel>
-			}
+      actions={
+        <ActionPanel>
+          <Action key="clearStorage" onAction={() => LocalStorage.clear()} title={"Clear local storage"} />
+        </ActionPanel>
+      }
     >
       <List.Section title="Results" subtitle={state.results.length + ""}>
         {state.results.map((searchResult) => (
@@ -38,44 +30,40 @@ export default function Command() {
   );
 }
 
-function TaskDetail({ task }: {task: WrikeTask}) {
+function TaskDetail({ task }: { task: WrikeTask }) {
   const detailsMarkdown = `
   # ${task.title}
 
   ## Description
   ${NodeHtmlMarkdown.translate(task.description)}
-  `
+  `;
 
   return (
     <Detail
       markdown={detailsMarkdown}
       navigationTitle={task.title}
-			actions={
-				<ActionPanel>
-					<ActionPanel.Section>
-						<Action.OpenInBrowser title="Open in Browser" url={task.permalink} />
-						<Action.CopyToClipboard
-							title="Copy Permalink"
-							content={task.permalink}
-							shortcut={{ modifiers: ["cmd"], key: "." }}
-						/>
-					</ActionPanel.Section>
-				</ActionPanel>
-			}
+      actions={
+        <ActionPanel>
+          <ActionPanel.Section>
+            <Action.OpenInBrowser title="Open in Browser" url={task.permalink} />
+            <Action.CopyToClipboard
+              title="Copy Permalink"
+              content={task.permalink}
+              shortcut={{ modifiers: ["cmd"], key: "." }}
+            />
+          </ActionPanel.Section>
+        </ActionPanel>
+      }
       metadata={
         <Detail.Metadata>
           <Detail.Metadata.TagList title="Status">
             <Detail.Metadata.TagList.Item text={task.status} color={statusToColorMap(task.status)} />
           </Detail.Metadata.TagList>
-          <Detail.Metadata.Link
-            title="Link"
-            target={task.permalink}
-            text="Open in Wrike"
-        />
+          <Detail.Metadata.Link title="Link" target={task.permalink} text="Open in Wrike" />
         </Detail.Metadata>
       }
-      />
-  )
+    />
+  );
 }
 
 function SearchListItem({ searchResult }: { searchResult: WrikeTask }) {
@@ -84,19 +72,19 @@ function SearchListItem({ searchResult }: { searchResult: WrikeTask }) {
       key={searchResult.id}
       title={searchResult.title}
       subtitle={searchResult.briefDescription}
-      accessories={[{text: searchResult.status}]}
+      accessories={[{ text: searchResult.status }]}
       actions={
         <ActionPanel>
-          <Action.Push title="View task detail" target={<TaskDetail task={searchResult} />}/>
+          <Action.Push title="View task detail" target={<TaskDetail task={searchResult} />} />
           <ActionPanel.Section>
             <Action.OpenInBrowser title="Open in Browser" url={searchResult.permalink} />
           </ActionPanel.Section>
           <ActionPanel.Section>
-						<Action.CopyToClipboard
-							title="Copy Title - Permalink"
-							content={`${searchResult.title} - ${searchResult.permalink}`}
-							shortcut={{ modifiers: ["cmd"], key: "," }}
-						/>
+            <Action.CopyToClipboard
+              title="Copy Title - Permalink"
+              content={`${searchResult.title} - ${searchResult.permalink}`}
+              shortcut={{ modifiers: ["cmd"], key: "," }}
+            />
             <Action.CopyToClipboard
               title="Copy Permalink"
               content={searchResult.permalink}
@@ -128,8 +116,7 @@ function useSearch() {
           results: results,
           isLoading: false,
         }));
-      }
-			catch (error) {
+      } catch (error) {
         setState((oldState) => ({
           ...oldState,
           isLoading: false,
@@ -161,27 +148,25 @@ function useSearch() {
 
 async function performSearch(searchText: string, signal: AbortSignal): Promise<WrikeTask[]> {
   const params = new URLSearchParams();
-	const currentUser = await getCurrentUser(signal);
+  const currentUser = await getCurrentUser(signal);
 
-  params.append("fields", `[description]`)
+  params.append("fields", `[description]`);
 
-	if(searchText.length == 0) {
-		params.append("authors", `[${currentUser?.id}]`)
-		params.append("status", "Active")
-		params.append("sortField", 'UpdatedDate')
-		params.append("sortOrder", 'Desc')
-		params.append("limit", '100')
-	} else {
-		params.append("title", searchText)
-		params.append("sortField", 'status')
-		params.append("sortOrder", 'Asc')
-	}
+  if (searchText.length == 0) {
+    params.append("authors", `[${currentUser?.id}]`);
+    params.append("status", "Active");
+    params.append("sortField", "UpdatedDate");
+    params.append("sortOrder", "Desc");
+    params.append("limit", "100");
+  } else {
+    params.append("title", searchText);
+    params.append("sortField", "status");
+    params.append("sortOrder", "Asc");
+  }
 
-  const response = await getRequest<WrikeTask>('tasks', params, signal);
+  const response = await getRequest<WrikeTask>("tasks", params, signal);
 
   return response.data.map((result) => {
     return result;
   });
 }
-
-

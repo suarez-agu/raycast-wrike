@@ -1,10 +1,10 @@
 export interface WrikeTask {
-  id: string,
-  title: string,
-  description: string,
-  briefDescription: string,
-  status: string,
-  permalink: string
+  id: string;
+  title: string;
+  description: string;
+  briefDescription: string;
+  status: string;
+  permalink: string;
 }
 
 export interface SearchState {
@@ -13,28 +13,28 @@ export interface SearchState {
 }
 
 export interface Preferences {
-  token: string
+  token: string;
 }
 
 export interface WrikeUser {
-  id: string,
-  firstName: string,
-  lastName:  string,
-  profiles: UserProfile[],
-  me: boolean,
+  id: string;
+  firstName: string;
+  lastName: string;
+  profiles: UserProfile[];
+  me: boolean;
 }
 
 export interface WrikeResponse<T> {
-  kind: string,
-  data: T[]
+  kind: string;
+  data: T[];
 }
 
 export interface APIError {
-  error: string,
-  errorDescription: string
+  error: string;
+  errorDescription: string;
 }
 
 interface UserProfile {
-  accountId: string,
-  email: string,
+  accountId: string;
+  email: string;
 }
