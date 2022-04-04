@@ -25,7 +25,6 @@ export default function Command() {
 }
 
 function TaskDetail({ task }: {task: WrikeTask}) {
-  console.log(task)
   const detailsMarkdown = `
   # ${task.title}
 
@@ -59,7 +58,7 @@ function SearchListItem({ searchResult }: { searchResult: WrikeTask }) {
       key={searchResult.id}
       title={searchResult.title}
       subtitle={searchResult.briefDescription}
-      accessoryTitle={searchResult.status}
+      accessories={[{text: searchResult.status}]}
       actions={
         <ActionPanel>
           <Action.Push title="View task detail" target={<TaskDetail task={searchResult} />}/>
@@ -67,6 +66,11 @@ function SearchListItem({ searchResult }: { searchResult: WrikeTask }) {
             <Action.OpenInBrowser title="Open in Browser" url={searchResult.permalink} />
           </ActionPanel.Section>
           <ActionPanel.Section>
+						<Action.CopyToClipboard
+							title="Copy Title - Permalink"
+							content={`${searchResult.title} - ${searchResult.permalink}`}
+							shortcut={{ modifiers: ["cmd"], key: "," }}
+						/>
             <Action.CopyToClipboard
               title="Copy Permalink"
               content={searchResult.permalink}
@@ -81,7 +85,6 @@ function SearchListItem({ searchResult }: { searchResult: WrikeTask }) {
 
 function useSearch() {
   const [state, setState] = useState<SearchState>({ results: [], isLoading: true });
-  
   const cancelRef = useRef<AbortController | null>(null);
 
   const search = useCallback(
@@ -99,7 +102,8 @@ function useSearch() {
           results: results,
           isLoading: false,
         }));
-      } catch (error) {
+      }
+			catch (error) {
         setState((oldState) => ({
           ...oldState,
           isLoading: false,
