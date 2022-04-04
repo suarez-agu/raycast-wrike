@@ -15,3 +15,6 @@ Allows you to search for Wrike tasks from Raycast
 - View task description
 - Copy permalink
 - Copy Title + Permalink
+
+## Missing something?
+If you can contribute, you can do so [here](https://github.com/suarez-agu/raycast-wrike)
