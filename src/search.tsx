@@ -1,4 +1,13 @@
-import { ActionPanel, Action, List, showToast, Toast, Detail, LocalStorage } from "@raycast/api";
+import {
+  ActionPanel,
+  Action,
+  List,
+  showToast,
+  Toast,
+  Detail,
+  LocalStorage,
+  Icon
+} from "@raycast/api";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { WrikeTask, SearchState } from "./types";
 import { NodeHtmlMarkdown } from "node-html-markdown";
@@ -75,20 +84,23 @@ function SearchListItem({ searchResult }: { searchResult: WrikeTask }) {
       accessories={[{ text: searchResult.status }]}
       actions={
         <ActionPanel>
-          <Action.Push title="View task detail" target={<TaskDetail task={searchResult} />} />
           <ActionPanel.Section>
+            <Action.Push
+              title="View task detail"
+              target={<TaskDetail task={searchResult} />}
+              icon={Icon.TextDocument} />
             <Action.OpenInBrowser title="Open in Browser" url={searchResult.permalink} />
           </ActionPanel.Section>
-          <ActionPanel.Section>
+          <ActionPanel.Section title={"Copy"}>
             <Action.CopyToClipboard
-              title="Copy Title - Permalink"
-              content={`${searchResult.title} - ${searchResult.permalink}`}
-              shortcut={{ modifiers: ["cmd"], key: "," }}
-            />
-            <Action.CopyToClipboard
-              title="Copy Permalink"
+              title="Permalink"
               content={searchResult.permalink}
               shortcut={{ modifiers: ["cmd"], key: "." }}
+            />
+            <Action.CopyToClipboard
+              title="Title and Permalink"
+              content={`${searchResult.title} - ${searchResult.permalink}`}
+              shortcut={{ modifiers: ["cmd"], key: "," }}
             />
           </ActionPanel.Section>
         </ActionPanel>
