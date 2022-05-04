@@ -1,13 +1,4 @@
-import {
-  ActionPanel,
-  Action,
-  List,
-  showToast,
-  Toast,
-  Detail,
-  LocalStorage,
-  Icon
-} from "@raycast/api";
+import { ActionPanel, Action, List, showToast, Toast, Detail, LocalStorage, Icon } from "@raycast/api";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { WrikeTask, SearchState } from "./types";
 import { NodeHtmlMarkdown } from "node-html-markdown";
@@ -30,11 +21,8 @@ export default function Command() {
         </ActionPanel>
       }
     >
-      { state.results.length === 0 ? (
-        <List.EmptyView
-          icon={{ source: "../assets/wrike_logo_small.png"}}
-          title="No tasks found"
-        />
+      {state.results.length === 0 ? (
+        <List.EmptyView icon={{ source: "../assets/wrike_logo_small.png" }} title="No tasks found" />
       ) : (
         <List.Section title="Results" subtitle={state.results.length + ""}>
           {state.results.map((searchResult) => (
@@ -95,7 +83,8 @@ function SearchListItem({ searchResult }: { searchResult: WrikeTask }) {
             <Action.Push
               title="View task detail"
               target={<TaskDetail task={searchResult} />}
-              icon={Icon.TextDocument} />
+              icon={Icon.TextDocument}
+            />
             <Action.OpenInBrowser title="Open in Browser" url={searchResult.permalink} />
           </ActionPanel.Section>
           <ActionPanel.Section title={"Copy"}>
