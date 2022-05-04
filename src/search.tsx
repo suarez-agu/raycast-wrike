@@ -3,7 +3,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { WrikeTask, SearchState } from "./types";
 import { NodeHtmlMarkdown } from "node-html-markdown";
 import { URLSearchParams } from "url";
-import { getCurrentUser, getRequest, statusToColorMap } from "./wrike";
+import { getRequest, statusToColorMap } from "./wrike";
 import { AbortError } from "node-fetch";
 
 export default function Command() {
@@ -13,7 +13,7 @@ export default function Command() {
     <List
       isLoading={state.isLoading}
       onSearchTextChange={search}
-      searchBarPlaceholder="Search Wrike tasks..."
+      searchBarPlaceholder="Enter two or more characters"
       throttle
       actions={
         <ActionPanel>
@@ -119,7 +119,10 @@ function useSearch() {
       }));
 
       try {
-        const results = await performSearch(searchText, cancelRef.current.signal);
+        let results: WrikeTask[] = [];
+        if (searchText.length != 0) {
+          results = await performSearch(searchText, cancelRef.current.signal);
+        }
         setState((oldState) => ({
           ...oldState,
           results: results,
@@ -157,21 +160,11 @@ function useSearch() {
 
 async function performSearch(searchText: string, signal: AbortSignal): Promise<WrikeTask[]> {
   const params = new URLSearchParams();
-  const currentUser = await getCurrentUser(signal);
 
   params.append("fields", `[description]`);
-
-  if (searchText.length == 0) {
-    params.append("authors", `[${currentUser?.id}]`);
-    params.append("status", "Active");
-    params.append("sortField", "UpdatedDate");
-    params.append("sortOrder", "Desc");
-    params.append("limit", "100");
-  } else {
-    params.append("title", searchText);
-    params.append("sortField", "status");
-    params.append("sortOrder", "Asc");
-  }
+  params.append("title", searchText);
+  params.append("sortField", "status");
+  params.append("sortOrder", "Asc");
 
   const response = await getRequest<WrikeTask>("tasks", params, signal);
 
