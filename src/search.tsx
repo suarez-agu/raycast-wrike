@@ -30,11 +30,18 @@ export default function Command() {
         </ActionPanel>
       }
     >
-      <List.Section title="Results" subtitle={state.results.length + ""}>
-        {state.results.map((searchResult) => (
-          <SearchListItem key={searchResult.id} searchResult={searchResult} />
-        ))}
-      </List.Section>
+      { state.results.length === 0 ? (
+        <List.EmptyView
+          icon={{ source: "../assets/wrike_logo_small.png"}}
+          title="No tasks found"
+        />
+      ) : (
+        <List.Section title="Results" subtitle={state.results.length + ""}>
+          {state.results.map((searchResult) => (
+            <SearchListItem key={searchResult.id} searchResult={searchResult} />
+          ))}
+        </List.Section>
+      )}
     </List>
   );
 }
@@ -121,6 +128,7 @@ function useSearch() {
         ...oldState,
         isLoading: true,
       }));
+
       try {
         const results = await performSearch(searchText, cancelRef.current.signal);
         setState((oldState) => ({
